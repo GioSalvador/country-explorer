@@ -1,0 +1,28 @@
+<div class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Explorador de Países</h1>
+
+    <div class="flex flex-col md:flex-row gap-4 mb-8">
+      <input
+        type="text"
+        placeholder="Buscar país..."
+        class="p-3 rounded-lg shadow w-full md:w-1/2"
+      />
+
+      <select class="p-3 rounded-lg shadow w-full md:w-1/4">
+        <option value="">Filtrar por região</option>
+        <option>Africa</option>
+        <option>Americas</option>
+        <option>Asia</option>
+        <option>Europe</option>
+        <option>Oceania</option>
+      </select>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      @for (country of countries; track country.code) {
+        <app-country-card [country]="country"></app-country-card>
+      }
+    </div>
+  </div>
+</div>

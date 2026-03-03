@@ -1,0 +1,14 @@
+<div
+  (click)="navigateToDetail()"
+  class="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer"
+>
+  <img [src]="country.flag" [alt]="country.name" class="w-full h-40 object-cover rounded-t-xl" />
+  <div class="p-4">
+    <h2 class="font-bold text-lg mb-2">
+      {{ country.name }}
+    </h2>
+    <p class="text-sm"><strong>População:</strong> {{ country.population | number }}</p>
+    <p class="text-sm"><strong>Região:</strong> {{ country.region }}</p>
+    <p class="text-sm"><strong>Capital:</strong> {{ country.capital }}</p>
+  </div>
+</div>
