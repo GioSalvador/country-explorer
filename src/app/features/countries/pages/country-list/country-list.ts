@@ -15,19 +15,28 @@ export class CountryList {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
+  searchTerm = signal('');
   pageSize = 9;
 
-  private allCountries = signal<any[]>([]);
-
+  allCountries = signal<any[]>([]);
   currentPage = signal(1);
 
-  totalPages = computed(() => Math.ceil(this.allCountries().length / this.pageSize));
+  filteredCountries = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+
+    if (!term) return this.allCountries();
+
+    return this.allCountries().filter((country) => country.name.toLowerCase().includes(term));
+  });
+
+  totalPages = computed(() => Math.ceil(this.filteredCountries().length / this.pageSize));
 
   paginatedCountries = computed(() => {
     const page = this.currentPage();
     const start = (page - 1) * this.pageSize;
     const end = start + this.pageSize;
-    return this.allCountries().slice(start, end);
+
+    return this.filteredCountries().slice(start, end);
   });
 
   constructor() {
@@ -37,16 +46,27 @@ export class CountryList {
 
     this.route.queryParamMap.subscribe((params) => {
       const page = Number(params.get('page')) || 1;
+      const search = params.get('search') || '';
+
       this.currentPage.set(page);
+      this.searchTerm.set(search);
     });
 
     effect(() => {
       this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: { page: this.currentPage() },
+        queryParams: {
+          page: this.currentPage(),
+          search: this.searchTerm() || null,
+        },
         queryParamsHandling: 'merge',
       });
     });
+  }
+
+  updateSearch(value: string) {
+    this.searchTerm.set(value);
+    this.currentPage.set(1);
   }
 
   nextPage() {
