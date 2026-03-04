@@ -1,48 +1,71 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CountryService } from '../../services/country.service';
 import { CountryCard } from '../../components/country-card/country-card';
-
-interface CountryMock {
-  name: string;
-  population: number;
-  region: string;
-  capital: string;
-  flag: string;
-  code: string;
-}
 
 @Component({
   selector: 'app-country-list',
   standalone: true,
   imports: [CommonModule, CountryCard],
   templateUrl: './country-list.html',
-  styleUrl: './country-list.css',
 })
 export class CountryList {
-  countries: CountryMock[] = [
-    {
-      name: 'Brazil',
-      population: 214000000,
-      region: 'Americas',
-      capital: 'Brasília',
-      flag: 'https://flagcdn.com/w320/br.png',
-      code: 'BRA',
-    },
-    {
-      name: 'Germany',
-      population: 83000000,
-      region: 'Europe',
-      capital: 'Berlin',
-      flag: 'https://flagcdn.com/w320/de.png',
-      code: 'DEU',
-    },
-    {
-      name: 'Japan',
-      population: 125000000,
-      region: 'Asia',
-      capital: 'Tokyo',
-      flag: 'https://flagcdn.com/w320/jp.png',
-      code: 'JPN',
-    },
-  ];
+  private countryService = inject(CountryService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  pageSize = 9;
+
+  private allCountries = signal<any[]>([]);
+
+  currentPage = signal(1);
+
+  totalPages = computed(() => Math.ceil(this.allCountries().length / this.pageSize));
+
+  paginatedCountries = computed(() => {
+    const page = this.currentPage();
+    const start = (page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    return this.allCountries().slice(start, end);
+  });
+
+  constructor() {
+    this.countryService.getCountries().subscribe((data) => {
+      this.allCountries.set(data);
+    });
+
+    this.route.queryParamMap.subscribe((params) => {
+      const page = Number(params.get('page')) || 1;
+      this.currentPage.set(page);
+    });
+
+    effect(() => {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { page: this.currentPage() },
+        queryParamsHandling: 'merge',
+      });
+    });
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((p) => p + 1);
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update((p) => p - 1);
+    }
+  }
+
+  goToFirstPage() {
+    this.currentPage.set(1);
+  }
+
+  goToLastPage() {
+    this.currentPage.set(this.totalPages());
+  }
 }

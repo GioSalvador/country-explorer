@@ -1,16 +1,16 @@
 <div class="min-h-screen bg-gray-100 p-8">
   <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-8">Explorador de Países</h1>
+    <h1 class="text-3xl font-bold mb-8">Country Explorer</h1>
 
     <div class="flex flex-col md:flex-row gap-4 mb-8">
       <input
         type="text"
-        placeholder="Buscar país..."
+        placeholder="Search country..."
         class="p-3 rounded-lg shadow w-full md:w-1/2"
       />
 
       <select class="p-3 rounded-lg shadow w-full md:w-1/4">
-        <option value="">Filtrar por região</option>
+        <option value="">Region Filter</option>
         <option>Africa</option>
         <option>Americas</option>
         <option>Asia</option>
@@ -18,11 +18,47 @@
         <option>Oceania</option>
       </select>
     </div>
+    <h2 class="text-2xl font-bold mb-6">Countries</h2>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      @for (country of countries; track country.code) {
-        <app-country-card [country]="country"></app-country-card>
-      }
+    <div class="grid gap-4 md:grid-cols-3">
+      <app-country-card *ngFor="let country of paginatedCountries()" [country]="country">
+      </app-country-card>
+    </div>
+
+    <div class="flex justify-center items-center gap-3 mt-8 flex-wrap">
+      <button
+        (click)="goToFirstPage()"
+        [disabled]="currentPage() === 1"
+        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        First
+      </button>
+
+      <button
+        (click)="prevPage()"
+        [disabled]="currentPage() === 1"
+        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Prev
+      </button>
+
+      <span class="px-4 py-2 font-medium"> Page {{ currentPage() }} of {{ totalPages() }} </span>
+
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage() === totalPages()"
+        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Next
+      </button>
+
+      <button
+        (click)="goToLastPage()"
+        [disabled]="currentPage() === totalPages()"
+        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Last
+      </button>
     </div>
   </div>
 </div>
