@@ -12,4 +12,7 @@ import { Country } from '../../services/country.service';
 })
 export class CountryCard {
   @Input() country!: Country;
+  @Input() search!: string;
+  @Input() region!: string;
+  @Input() page!: number;
 }

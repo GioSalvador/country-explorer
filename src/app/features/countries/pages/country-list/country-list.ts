@@ -27,12 +27,26 @@ export class CountryList {
     const term = this.searchTerm().toLowerCase().trim();
     const region = this.region();
 
-    return this.allCountries().filter((country) => {
-      const matchesSearch = !term || country.name.toLowerCase().includes(term);
+    const filtered = this.allCountries().filter((country) => {
+      const name = country.name.toLowerCase();
 
+      const matchesSearch = !term || name.includes(term);
       const matchesRegion = !region || country.region === region;
 
       return matchesSearch && matchesRegion;
+    });
+
+    return filtered.sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+
+      const aStarts = term && nameA.startsWith(term);
+      const bStarts = term && nameB.startsWith(term);
+
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      return nameA.localeCompare(nameB);
     });
   });
 
@@ -71,15 +85,6 @@ export class CountryList {
         },
         queryParamsHandling: 'merge',
       });
-    });
-
-    effect(() => {
-      const term = this.searchTerm();
-      const region = this.region();
-
-      if (term || region) {
-        this.currentPage.set(1);
-      }
     });
   }
 

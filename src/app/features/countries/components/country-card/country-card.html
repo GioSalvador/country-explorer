@@ -1,6 +1,11 @@
 <div
   class="cursor-pointer bg-white rounded-xl shadow p-4 hover:shadow-lg transition"
   [routerLink]="['/countries', country.code]"
+  [queryParams]="{
+    search: search,
+    region: region,
+    page: page,
+  }"
 >
   <img [src]="country.flag" class="w-full h-40 object-cover rounded" />
 

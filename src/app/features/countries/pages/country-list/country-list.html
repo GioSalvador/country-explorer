@@ -28,7 +28,13 @@
     <h2 class="text-2xl font-bold mb-6">Countries</h2>
 
     <div *ngIf="filteredCountries().length > 0; else noResults" class="grid gap-4 md:grid-cols-3">
-      <app-country-card *ngFor="let country of paginatedCountries()" [country]="country">
+      <app-country-card
+        *ngFor="let country of paginatedCountries()"
+        [country]="country"
+        [search]="searchTerm()"
+        [region]="region()"
+        [page]="currentPage()"
+      >
       </app-country-card>
     </div>
 
