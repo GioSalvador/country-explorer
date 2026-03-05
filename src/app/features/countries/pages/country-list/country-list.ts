@@ -16,6 +16,8 @@ export class CountryList {
   private router = inject(Router);
 
   searchTerm = signal('');
+  region = signal('');
+
   pageSize = 9;
 
   allCountries = signal<any[]>([]);
@@ -23,10 +25,15 @@ export class CountryList {
 
   filteredCountries = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
+    const region = this.region();
 
-    if (!term) return this.allCountries();
+    return this.allCountries().filter((country) => {
+      const matchesSearch = !term || country.name.toLowerCase().includes(term);
 
-    return this.allCountries().filter((country) => country.name.toLowerCase().includes(term));
+      const matchesRegion = !region || country.region === region;
+
+      return matchesSearch && matchesRegion;
+    });
   });
 
   totalPages = computed(() => Math.ceil(this.filteredCountries().length / this.pageSize));
@@ -47,9 +54,11 @@ export class CountryList {
     this.route.queryParamMap.subscribe((params) => {
       const page = Number(params.get('page')) || 1;
       const search = params.get('search') || '';
+      const region = params.get('region') || '';
 
       this.currentPage.set(page);
       this.searchTerm.set(search);
+      this.region.set(region);
     });
 
     effect(() => {
@@ -58,9 +67,19 @@ export class CountryList {
         queryParams: {
           page: this.currentPage(),
           search: this.searchTerm() || null,
+          region: this.region() || null,
         },
         queryParamsHandling: 'merge',
       });
+    });
+
+    effect(() => {
+      const term = this.searchTerm();
+      const region = this.region();
+
+      if (term || region) {
+        this.currentPage.set(1);
+      }
     });
   }
 
@@ -87,5 +106,20 @@ export class CountryList {
 
   goToLastPage() {
     this.currentPage.set(this.totalPages());
+  }
+
+  clearFilters() {
+    this.searchTerm.set('');
+    this.region.set('');
+    this.currentPage.set(1);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page: 1,
+        search: null,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 }
