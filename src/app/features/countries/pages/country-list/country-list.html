@@ -12,24 +12,44 @@
           (input)="updateSearch($any($event.target).value)"
         />
       </div>
-
-      <select class="p-3 rounded-lg shadow w-full md:w-1/4">
-        <option value="">Region Filter</option>
-        <option>Africa</option>
-        <option>Americas</option>
-        <option>Asia</option>
-        <option>Europe</option>
-        <option>Oceania</option>
+      <select
+        class="p-3 rounded-lg shadow w-full md:w-1/4"
+        [value]="region()"
+        (change)="region.set($any($event.target).value)"
+      >
+        <option value="">All Regions</option>
+        <option value="Africa">Africa</option>
+        <option value="Americas">Americas</option>
+        <option value="Asia">Asia</option>
+        <option value="Europe">Europe</option>
+        <option value="Oceania">Oceania</option>
       </select>
     </div>
     <h2 class="text-2xl font-bold mb-6">Countries</h2>
 
-    <div class="grid gap-4 md:grid-cols-3">
+    <div *ngIf="filteredCountries().length > 0; else noResults" class="grid gap-4 md:grid-cols-3">
       <app-country-card *ngFor="let country of paginatedCountries()" [country]="country">
       </app-country-card>
     </div>
 
-    <div class="flex justify-center items-center gap-3 mt-8 flex-wrap">
+    <ng-template #noResults>
+      <div class="text-center py-16 text-gray-500">
+        <p class="text-xl font-semibold">No countries found</p>
+        <p class="text-sm mt-2 mb-4">Try adjusting your search or region filter.</p>
+
+        <button
+          (click)="clearFilters()"
+          class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+        >
+          Clear Filters
+        </button>
+      </div>
+    </ng-template>
+
+    <div
+      *ngIf="filteredCountries().length > 0"
+      class="flex justify-center items-center gap-3 mt-8 flex-wrap"
+    >
       <button
         (click)="goToFirstPage()"
         [disabled]="currentPage() === 1"
