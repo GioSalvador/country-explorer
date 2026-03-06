@@ -18,7 +18,7 @@ export class CountryList {
   searchTerm = signal('');
   region = signal('');
 
-  pageSize = 9;
+  pageSize = 12;
 
   allCountries = signal<any[]>([]);
   currentPage = signal(1);

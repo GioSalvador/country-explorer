@@ -1,19 +1,21 @@
-<div class="min-h-screen bg-gray-100 p-8">
-  <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-8">Country Explorer</h1>
-
-    <div class="flex flex-col md:flex-row gap-4 mb-8">
-      <div class="relative w-full md:w-1/2">
+<div class="h-screen flex flex-col">
+  <div class="max-w-7xl mx-auto w-full px-6 py-6 flex flex-col flex-1">
+    <header class="mb-6">
+      <h1 class="text-3xl font-semibold tracking-tight text-white">Country Explorer</h1>
+    </header>
+    <div class="flex flex-col md:flex-row gap-4 mb-6">
+      <div class="relative w-full md:w-2/3">
         <input
           type="text"
           [value]="searchTerm()"
-          placeholder="Search country..."
-          class="w-full border px-4 py-2 rounded"
+          placeholder="Search for a country..."
+          class="w-full px-5 py-3 rounded-xl bg-white/95 border border-white/20 shadow-sm focus:ring-2 focus:ring-primaryLight outline-none transition"
           (input)="updateSearch($any($event.target).value)"
         />
       </div>
+
       <select
-        class="p-3 rounded-lg shadow w-full md:w-1/4"
+        class="px-4 py-3 rounded-xl bg-white shadow-sm border border-white/20 focus:ring-2 focus:ring-primaryLight outline-none transition cursor-pointer"
         [value]="region()"
         (change)="region.set($any($event.target).value)"
       >
@@ -25,70 +27,75 @@
         <option value="Oceania">Oceania</option>
       </select>
     </div>
-    <h2 class="text-2xl font-bold mb-6">Countries</h2>
+    <div class="flex-1 flex flex-col">
+      <h2 class="text-xl font-semibold text-white mb-4">Countries</h2>
 
-    <div *ngIf="filteredCountries().length > 0; else noResults" class="grid gap-4 md:grid-cols-3">
-      <app-country-card
-        *ngFor="let country of paginatedCountries()"
-        [country]="country"
-        [search]="searchTerm()"
-        [region]="region()"
-        [page]="currentPage()"
+      <div
+        *ngIf="filteredCountries().length > 0; else noResults"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-1 content-start"
       >
-      </app-country-card>
-    </div>
+        <app-country-card
+          *ngFor="let country of paginatedCountries()"
+          [country]="country"
+          [search]="searchTerm()"
+          [region]="region()"
+          [page]="currentPage()"
+        >
+        </app-country-card>
+      </div>
+      <ng-template #noResults>
+        <div class="flex flex-col items-center justify-center flex-1 text-center">
+          <p class="text-white text-xl font-semibold">No countries found</p>
 
-    <ng-template #noResults>
-      <div class="text-center py-16 text-gray-500">
-        <p class="text-xl font-semibold">No countries found</p>
-        <p class="text-sm mt-2 mb-4">Try adjusting your search or region filter.</p>
+          <p class="text-white/70 text-sm mt-2 mb-4">Try adjusting your search or region filter.</p>
+
+          <button
+            (click)="clearFilters()"
+            class="px-5 py-2 rounded-lg bg-primaryLight text-white hover:bg-primaryDeep hover:cursor-pointer transition"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </ng-template>
+    </div>
+    <div *ngIf="filteredCountries().length > 0" class="flex justify-center mt-4 overflow-x-auto">
+      <div class="flex items-center gap-2 flex-nowrap">
+        <button
+          (click)="goToFirstPage()"
+          [disabled]="currentPage() === 1"
+          class="px-2 py-1 text-xs md:px-3 md:py-2 md:text-sm bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-40 hover:cursor-pointer"
+        >
+          «
+        </button>
 
         <button
-          (click)="clearFilters()"
-          class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition"
+          (click)="prevPage()"
+          [disabled]="currentPage() === 1"
+          class="px-2 py-1 text-xs md:px-3 md:py-2 md:text-sm bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-40 hover:cursor-pointer"
         >
-          Clear Filters
+          ‹
+        </button>
+
+        <span class="px-2 text-xs md:text-sm font-medium text-white whitespace-nowrap">
+          Page {{ currentPage() }} of {{ totalPages() }}
+        </span>
+
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()"
+          class="px-2 py-1 text-xs md:px-3 md:py-2 md:text-sm bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-40 hover:cursor-pointer"
+        >
+          ›
+        </button>
+
+        <button
+          (click)="goToLastPage()"
+          [disabled]="currentPage() === totalPages()"
+          class="px-2 py-1 text-xs md:px-3 md:py-2 md:text-sm bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-40 hover:cursor-pointer"
+        >
+          »
         </button>
       </div>
-    </ng-template>
-
-    <div
-      *ngIf="filteredCountries().length > 0"
-      class="flex justify-center items-center gap-3 mt-8 flex-wrap"
-    >
-      <button
-        (click)="goToFirstPage()"
-        [disabled]="currentPage() === 1"
-        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        First
-      </button>
-
-      <button
-        (click)="prevPage()"
-        [disabled]="currentPage() === 1"
-        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Prev
-      </button>
-
-      <span class="px-4 py-2 font-medium"> Page {{ currentPage() }} of {{ totalPages() }} </span>
-
-      <button
-        (click)="nextPage()"
-        [disabled]="currentPage() === totalPages()"
-        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Next
-      </button>
-
-      <button
-        (click)="goToLastPage()"
-        [disabled]="currentPage() === totalPages()"
-        class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        Last
-      </button>
     </div>
   </div>
 </div>
