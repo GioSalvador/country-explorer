@@ -10,14 +10,15 @@ export interface Country {
   code: string;
   region: string;
 }
-
 @Injectable({
   providedIn: 'root',
 })
 export class CountryService {
   private http = inject(HttpClient);
+
   private API_URL =
     'https://restcountries.com/v3.1/all?fields=name,capital,population,flags,region,cca3';
+
   getCountries(): Observable<Country[]> {
     return this.http.get<any>(this.API_URL).pipe(
       map((response) => {
@@ -57,8 +58,24 @@ export class CountryService {
           area: c.area,
           timezones: c.timezones,
           maps: c.maps?.googleMaps,
+          borders: c.borders || [],
         };
       }),
+    );
+  }
+
+  getCountriesByCodes(codes: string[]) {
+    if (!codes.length) return [];
+
+    const codesString = codes.join(',');
+
+    return this.http.get<any[]>(`https://restcountries.com/v3.1/alpha?codes=${codesString}`).pipe(
+      map((countries) =>
+        countries.map((c) => ({
+          name: c.name.common,
+          code: c.cca3,
+        })),
+      ),
     );
   }
 }
