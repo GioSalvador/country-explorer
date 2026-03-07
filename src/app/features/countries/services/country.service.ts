@@ -41,14 +41,22 @@ export class CountryService {
   getCountryByCode(code: string) {
     return this.http.get<any[]>(`https://restcountries.com/v3.1/alpha/${code}`).pipe(
       map((response) => {
-        const country = response[0];
+        const c = response[0];
+
         return {
-          name: country.name?.common,
-          capital: country.capital?.[0] ?? 'No capital',
-          population: country.population,
-          flag: country.flags?.png,
-          code: country.cca3,
-          region: country.region,
+          name: c.name?.common,
+          officialName: c.name?.official,
+          capital: c.capital?.[0] ?? 'No capital',
+          population: c.population,
+          flag: c.flags?.png,
+          code: c.cca3,
+          region: c.region,
+          subregion: c.subregion,
+          languages: Object.values(c.languages || {}),
+          currencies: Object.values(c.currencies || {}).map((cur: any) => cur.name),
+          area: c.area,
+          timezones: c.timezones,
+          maps: c.maps?.googleMaps,
         };
       }),
     );
