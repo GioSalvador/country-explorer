@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CountryService } from '../../services/country.service';
 import { CountryCard } from '../../components/country-card/country-card';
+import { SkeletonCountryCard } from '../../components/skeleton-country-card/skeleton-country-card';
 
 @Component({
   selector: 'app-country-list',
   standalone: true,
-  imports: [CommonModule, CountryCard],
+  imports: [CommonModule, CountryCard, SkeletonCountryCard],
   templateUrl: './country-list.html',
 })
 export class CountryList {
@@ -17,6 +18,7 @@ export class CountryList {
 
   searchTerm = signal('');
   region = signal('');
+  loading = signal(true);
 
   pageSize = 12;
 
@@ -63,6 +65,7 @@ export class CountryList {
   constructor() {
     this.countryService.getCountries().subscribe((data) => {
       this.allCountries.set(data);
+      this.loading.set(false);
     });
 
     this.route.queryParamMap.subscribe((params) => {
@@ -126,5 +129,8 @@ export class CountryList {
       },
       queryParamsHandling: 'merge',
     });
+  }
+  trackCountry(index: number, country: any) {
+    return country.name.common;
   }
 }
