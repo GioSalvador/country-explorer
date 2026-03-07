@@ -9,6 +9,7 @@ export interface Country {
   flag: string;
   code: string;
   region: string;
+  area: number;
 }
 @Injectable({
   providedIn: 'root',
@@ -17,8 +18,7 @@ export class CountryService {
   private http = inject(HttpClient);
 
   private API_URL =
-    'https://restcountries.com/v3.1/all?fields=name,capital,population,flags,region,cca3';
-
+    'https://restcountries.com/v3.1/all?fields=name,capital,population,flags,region,cca3,area';
   getCountries(): Observable<Country[]> {
     return this.http.get<any>(this.API_URL).pipe(
       map((response) => {
@@ -34,6 +34,7 @@ export class CountryService {
           flag: country?.flags?.png ?? '',
           code: country?.cca3 ?? '',
           region: country?.region ?? '',
+          area: country?.area ?? 0,
         }));
       }),
     );

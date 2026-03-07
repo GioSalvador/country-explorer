@@ -25,6 +25,23 @@ export class CountryList {
   allCountries = signal<any[]>([]);
   currentPage = signal(1);
 
+  sortBy = signal<'name' | 'population' | 'area'>('name');
+
+  sortCountries(countries: any[]) {
+    const sort = this.sortBy();
+
+    switch (sort) {
+      case 'population':
+        return [...countries].sort((a, b) => b.population - a.population);
+
+      case 'area':
+        return [...countries].sort((a, b) => b.area - a.area);
+
+      default:
+        return [...countries].sort((a, b) => a.name.localeCompare(b.name));
+    }
+  }
+
   filteredCountries = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
     const region = this.region();
@@ -38,7 +55,7 @@ export class CountryList {
       return matchesSearch && matchesRegion;
     });
 
-    return filtered.sort((a, b) => {
+    const prioritized = filtered.sort((a, b) => {
       const nameA = a.name.toLowerCase();
       const nameB = b.name.toLowerCase();
 
@@ -48,8 +65,10 @@ export class CountryList {
       if (aStarts && !bStarts) return -1;
       if (!aStarts && bStarts) return 1;
 
-      return nameA.localeCompare(nameB);
+      return 0;
     });
+
+    return this.sortCountries(prioritized);
   });
 
   totalPages = computed(() => Math.ceil(this.filteredCountries().length / this.pageSize));
