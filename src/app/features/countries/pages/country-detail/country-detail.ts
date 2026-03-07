@@ -12,12 +12,9 @@ import { CountryService } from '../../services/country.service';
       <ng-container *ngIf="country$ | async as country; else loadingTpl">
         <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
           <div class="grid md:grid-cols-2 gap-8 p-8">
-            <!-- FLAG -->
             <div class="flex items-center justify-center">
               <img [src]="country.flag" class="rounded-xl shadow-lg max-h-64 object-cover" />
             </div>
-
-            <!-- INFO -->
             <div class="space-y-4">
               <h1 class="text-4xl font-bold text-gray-900">
                 {{ country.name }}
@@ -77,7 +74,27 @@ import { CountryService } from '../../services/country.service';
         </div>
       </ng-container>
       <ng-template #loadingTpl>
-        <div class="text-center text-gray-400">Loading country...</div>
+        <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8 animate-pulse">
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="h-64 bg-gray-300 rounded-xl"></div>
+
+            <div class="space-y-4">
+              <div class="h-8 bg-gray-300 rounded w-1/2"></div>
+              <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+
+              <div class="grid grid-cols-2 gap-4 mt-6">
+                <div class="h-4 bg-gray-200 rounded"></div>
+                <div class="h-4 bg-gray-200 rounded"></div>
+
+                <div class="h-4 bg-gray-200 rounded"></div>
+                <div class="h-4 bg-gray-200 rounded"></div>
+
+                <div class="h-4 bg-gray-200 rounded"></div>
+                <div class="h-4 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </ng-template>
       <div class="flex justify-center mt-5">
         <button

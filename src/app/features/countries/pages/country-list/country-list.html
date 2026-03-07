@@ -31,11 +31,13 @@
       <h2 class="text-xl font-semibold text-white mb-4">Countries</h2>
 
       <div
-        *ngIf="filteredCountries().length > 0; else noResults"
-        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-1 content-start"
+        *ngIf="loading(); else countriesLoaded"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-1 content-start cards-fade"
       >
         <app-country-card
-          *ngFor="let country of paginatedCountries()"
+          *ngFor="let country of paginatedCountries(); let i = index"
+          class="country-card-animate"
+          [style.animationDelay.ms]="i * 80"
           [country]="country"
           [search]="searchTerm()"
           [region]="region()"
@@ -43,6 +45,29 @@
         >
         </app-country-card>
       </div>
+      <ng-template #countriesLoaded>
+        <div
+          *ngIf="filteredCountries().length > 0; else noResults"
+          class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-1 content-start"
+        >
+          <app-country-card
+            *ngFor="let country of paginatedCountries(); let i = index; trackBy: trackCountry"
+            class="country-card-animate"
+            [style.animationDelay.ms]="i * 60"
+            [country]="country"
+            [search]="searchTerm()"
+            [region]="region()"
+            [page]="currentPage()"
+          >
+          </app-country-card>
+        </div>
+      </ng-template>
+      <ng-template #loadingSkeleton>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <app-skeleton-country-card *ngFor="let item of [].constructor(12)">
+          </app-skeleton-country-card>
+        </div>
+      </ng-template>
       <ng-template #noResults>
         <div class="flex flex-col items-center justify-center flex-1 text-center">
           <p class="text-white text-xl font-semibold">No countries found</p>

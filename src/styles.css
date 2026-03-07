@@ -11,3 +11,128 @@ html,
 body {
   height: 100%;
 }
+
+#app-loader {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #0f3b2e, #14532d, #166534);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: white;
+  font-family: 'Mona Sans', sans-serif;
+}
+
+.loader-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.loader-text {
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.loader-bar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: auto;
+}
+
+.loader-progress {
+  height: 100%;
+  width: 40%;
+  background: white;
+  animation: loading 1.2s infinite;
+}
+.loader-container {
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+.loader-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  animation: float 2s ease-in-out infinite;
+}
+
+.loader-text {
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.loader-bar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: auto;
+}
+
+.loader-progress {
+  height: 100%;
+  width: 40%;
+  background: white;
+  animation: loading 1.2s infinite;
+}
+
+.country-card-animate {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: cardReveal 0.45s ease forwards;
+}
+
+@keyframes cardReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(250%);
+  }
+}
