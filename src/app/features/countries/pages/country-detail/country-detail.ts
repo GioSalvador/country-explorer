@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { CountryService } from '../../services/country.service';
+import { switchMap, of, map } from 'rxjs';
 
 @Component({
   selector: 'app-country-detail',
@@ -15,6 +16,7 @@ import { CountryService } from '../../services/country.service';
             <div class="flex items-center justify-center">
               <img [src]="country.flag" class="rounded-xl shadow-lg max-h-64 object-cover" />
             </div>
+
             <div class="space-y-4">
               <h1 class="text-4xl font-bold text-gray-900">
                 {{ country.name }}
@@ -71,8 +73,25 @@ import { CountryService } from '../../services/country.service';
               </a>
             </div>
           </div>
+
+          <div *ngIf="borderCountries$ | async as borders" class="px-8 pb-8">
+            <div *ngIf="borders.length > 0">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Border Countries</h3>
+
+              <div class="flex flex-wrap gap-2">
+                <button
+                  *ngFor="let border of borders"
+                  (click)="goToCountry(border.code)"
+                  class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition hover:cursor-pointer"
+                >
+                  {{ border.name }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </ng-container>
+
       <ng-template #loadingTpl>
         <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8 animate-pulse">
           <div class="grid md:grid-cols-2 gap-8">
@@ -85,10 +104,8 @@ import { CountryService } from '../../services/country.service';
               <div class="grid grid-cols-2 gap-4 mt-6">
                 <div class="h-4 bg-gray-200 rounded"></div>
                 <div class="h-4 bg-gray-200 rounded"></div>
-
                 <div class="h-4 bg-gray-200 rounded"></div>
                 <div class="h-4 bg-gray-200 rounded"></div>
-
                 <div class="h-4 bg-gray-200 rounded"></div>
                 <div class="h-4 bg-gray-200 rounded"></div>
               </div>
@@ -96,6 +113,7 @@ import { CountryService } from '../../services/country.service';
           </div>
         </div>
       </ng-template>
+
       <div class="flex justify-center mt-5">
         <button
           (click)="goBack()"
@@ -109,12 +127,25 @@ import { CountryService } from '../../services/country.service';
 })
 export class CountryDetail {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private countryService = inject(CountryService);
   private location = inject(Location);
 
-  private code = this.route.snapshot.paramMap.get('code')!;
+  country$ = this.route.paramMap.pipe(
+    map((params) => params.get('code')!),
+    switchMap((code) => this.countryService.getCountryByCode(code)),
+  );
 
-  country$ = this.countryService.getCountryByCode(this.code);
+  borderCountries$ = this.country$.pipe(
+    switchMap((country: any) => {
+      if (!country.borders?.length) return of([]);
+      return this.countryService.getCountriesByCodes(country.borders);
+    }),
+  );
+
+  goToCountry(code: string) {
+    this.router.navigate(['/countries', code]);
+  }
 
   goBack() {
     this.location.back();
